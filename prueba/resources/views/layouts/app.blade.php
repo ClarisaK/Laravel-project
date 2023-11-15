@@ -1,3 +1,9 @@
+<?php
+  header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+  header("Expires: Sat, 1 Jul 2000 05:00:00 GMT"); // Fecha en el pasado
+?>
+
+
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -18,8 +24,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
     <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/app.css"') }}" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    
 </head>
 <body>
     <div id="app">
@@ -55,10 +62,10 @@
                             @endif
                         @else
                         <li class="nav-item">
-                            <a class="nav-link" href="">Inicio</a>
+                            <a class="nav-link" href="{{ route('home')}} ">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="">Subir imagen</a>
+                            <a class="nav-link" href="{{ route('images.create') }}">Subir imagen</a>
                         </li>
 
                         <li>
