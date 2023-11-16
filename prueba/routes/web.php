@@ -28,3 +28,8 @@ Route::get('/user/avatar/{filename}', [App\Http\Controllers\UserController::clas
 Route::get('/subir-imagen', [App\Http\Controllers\ImageController::class, 'create'])->name('images.create');
 Route::post('/images/save', [App\Http\Controllers\ImageController::class, 'save'])->name('images.save');
 Route::get('/image/file/{filename}', [App\Http\Controllers\ImageController::class, 'getImage'])->name('images.file');
+Route::get('/imagen/{id}', [App\Http\Controllers\ImageController::class, 'detail'])->name('images.detail');
+Route::post('/comment/save', [App\Http\Controllers\CommentController::class, 'save'])->name('comment.save');
+Route::get('/comment/delete/{id}', [App\Http\Controllers\CommentController::class, 'delete'])->name('comment.delete');
+Route::get('/like/{image_id}', [App\Http\Controllers\LikeController::class, 'like'])->name('like.save');
+Route::get('/dislike/{image_id}', [App\Http\Controllers\LikeController::class, 'dislike'])->name('like.delete');

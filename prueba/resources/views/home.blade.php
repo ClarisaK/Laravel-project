@@ -15,32 +15,52 @@
                     </div>
                     @endif
                     <div class="data-user">
-                        {{$image->user->name.' '.$image->user->surname}}
-                        <span class="nickname">
-                            {{' @'.$image->user->nickname}}
-                        </span>
+                        <a href="{{ route('images.detail', ['id' => $image->id])}}">
+                            {{$image->user->name.' '.$image->user->surname}}
+                            <span class="nickname">
+                                {{' @'.$image->user->nickname}}
+                            </span>
+                        </a>
                     </div>
                     
                 <div class="card-body">
                     <div class="image-container">
                     <img src="{{ route('images.file',['filename' => $image->image_path])}}" />
                     </div>
-                    <div class="likes">
-
-                    </div>
                     <div class="description">
                         <span class="nickname">{{'@'.$image->user->nick}}</span>
+                        <span class="nickname date">{{'|'.$image->created_at}}</span>
                         {{$image->description}}
                     </div>
+                    
+                    <div class="likes">
+                        {{-- se compueba si el usuario dio like --}}
+                        <?php $user_like = false; ?>
+                        @foreach($image->likes as $like)
+                        @if($like->user->id == Auth::user()->id )
+                        <?php $user_like = true; ?>
+                        @endif
+                        @endforeach
+                        
+                        @if($user_like)
+                        <img src="{{asset('img/favorite-4-64.png')}}" class="btn-dislike"/>
+                        @else
+                        <img src="{{asset('img/hearts-64.png')}}" class="btn-like"/>
+                        @endif
+                        {{count($image->likes)}}
+                    </div>
 
-                    <a href="" class ="btn btn-warning btn-comments">
-                        Comentarios
-                    </a>
+                    <div class="comments">
+                        <a href="" class ="btn btn-sm btn-warning btn-comments">
+                            Comentarios ({{count($image->comments)}})
+                        </a>
+                    </div>
 
                 </div>
 
-                <div class="clearfix"></div>
-                {{ $images->links() }}
+                <div class="clearfix">
+                    {{ $images->links() }}
+                </div>
 
             </div>
             @endforeach
