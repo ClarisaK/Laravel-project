@@ -1,81 +1,106 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            @include('includes.message')
-            <div class="card pub_image pub_image_detail">
-                <div class="card-header">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                @include('includes.message')
+                <div class="card pub_image pub_image_detail">
+                    <div class="card-header">
 
-                    @if($image->user->image)
-                    <div class="container-avatar">
-                        <img src="{{ route('user.avatar',['filename'=>$image->user->image]) }}" class="avatar"/>
-                    </div>
-                    @endif
-                    <div class="data-user">
-                        {{$image->user->name.' '.$image->user->surname}}
-                        <span class="nickname">
-                            {{' @'.$image->user->nickname}}
-                        </span>
-                    </div>
-                </div>
-                    
-                <div class="card-body">
-                    <div class="image-container image-detail">
-                    <img src="{{ route('images.file',['filename' => $image->image_path])}}" />
+                        @if ($image->user->image)
+                            <div class="container-avatar">
+                                <img src="{{ route('user.avatar', ['filename' => $image->user->image]) }}" class="avatar" />
+                            </div>
+                        @endif
+                        <div class="data-user">
+                            {{ $image->user->name . ' ' . $image->user->surname }}
+                            <span class="nickname">
+                                {{ ' @' . $image->user->nickname }}
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="description">
-                        <span class="nickname">{{'@'.$image->user->nick}}</span>
-                        {{$image->description}}
-                    </div>
-                    
-                    <div class="likes">
-                        <img src="{{asset('img/favorite-4-64.png')}}" />
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="comments">
-                        <h2>Comentarios ({{count($image->comments)}})</h2>
-                        <hr>
+                    <div class="card-body">
+                        <div class="image-container image-detail">
+                            <img src="{{ route('images.file', ['filename' => $image->image_path]) }}" />
+                        </div>
 
-                        <form method="POST" action="{{route('comment.save')}}">
-                            @csrf
-                        <input type="hidden" name="image_id" value="{{$image->id}}"/>
-                        <p>
-                            <textarea class="form-control" {{$errors->has('content') ? 'is-invalid' : ''}} name="content" required></textarea>
-                            @if($errors->has('content'))
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $errors->first('content')}}</strong>
-                                </span>
+                        <div class="description">
+                            <span class="nickname">{{ '@' . $image->user->nick }}</span>
+                            {{ $image->description }}
+                        </div>
+
+                        <div class="likes">
+                            {{-- se compueba si el usuario dio like --}}
+                            <?php $user_like = false; ?>
+                            @foreach ($image->likes as $like)
+                                @if ($like->user->id == Auth::user()->id)
+                                    <?php $user_like = true; ?>
+                                @endif
+                            @endforeach
+
+                            @if ($user_like)
+                                <img src="{{ asset('img/favorite-4-64.png') }}" data-id="{{ $image->id }}"
+                                    class="btn-dislike" />
+                            @else
+                                <img src="{{ asset('img/hearts-64.png') }}" data-id="{{ $image->id }}"
+                                    class="btn-like" />
                             @endif
-                        </p>
-                        
-                        <button type="submit" class="btn btn-success">
-                            Enviar
-                        </button>
-                        </form>
+                            <span class="number_likes">{{ count($image->likes) }}</span>
+                        </div>
 
-                        @foreach($image->comments as $comment)
-                            <div class="comment">
-                                <span class="nickname">{{'@'.$image->user->nick}}</span>
-                                {{$image->description}}
-                                <p>{{$comment->content}}<br/>
+                        @if(Auth::user() && Auth::user()->id == $image->user->id)
+                            <div class="actions">
+                                <a href="{{ route('images.edit', ['id' => $image->id])}}" class="btn btn-sm btn-primary">Actualizar</a>
+                                <a href="{{ route('images.delete', ['id' => $image->id]) }}" class="btn btn-sm btn-danger">Borrar</a>
+                            
+                            </div>
+                        @endif
 
-                                    @if(Auth::check() && ($comment->user_id == Auth::user()->id || $comment->image->user_id == Auth::user()->id))
-                                        <a href="{{route('comment.delete', ['id' => $comment->id])}}" class="btn btn-sm btn-danger">
-                                            Eliminar
-                                        </a>
+
+                        <div class="clearfix"></div>
+                        <div class="comments">
+                            <h2>Comentarios ({{ count($image->comments) }})</h2>
+                            <hr>
+
+                            <form method="POST" action="{{ route('comment.save') }}">
+                                @csrf
+                                <input type="hidden" name="image_id" value="{{ $image->id }}" />
+                                <p>
+                                    <textarea class="form-control" {{ $errors->has('content') ? 'is-invalid' : '' }} name="content" required></textarea>
+                                    @if ($errors->has('content'))
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('content') }}</strong>
+                                        </span>
                                     @endif
                                 </p>
-                            </div>
+
+                                <button type="submit" class="btn btn-success">
+                                    Enviar
+                                </button>
+                            </form>
+
+                            @foreach ($image->comments as $comment)
+                                <div class="comment">
+                                    <span class="nickname">{{ '@' . $image->user->nick }}</span>
+                                    {{ $image->description }}
+                                    <p>{{ $comment->content }}<br />
+
+                                        @if (Auth::check() && ($comment->user_id == Auth::user()->id || $comment->image->user_id == Auth::user()->id))
+                                            <a href="{{ route('comment.delete', ['id' => $comment->id]) }}"
+                                                class="btn btn-sm btn-danger">
+                                                Eliminar
+                                            </a>
+                                        @endif
+                                    </p>
+                                </div>
                             @endforeach
-                            
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endsection

@@ -33,3 +33,9 @@ Route::post('/comment/save', [App\Http\Controllers\CommentController::class, 'sa
 Route::get('/comment/delete/{id}', [App\Http\Controllers\CommentController::class, 'delete'])->name('comment.delete');
 Route::get('/like/{image_id}', [App\Http\Controllers\LikeController::class, 'like'])->name('like.save');
 Route::get('/dislike/{image_id}', [App\Http\Controllers\LikeController::class, 'dislike'])->name('like.delete');
+Route::get('/likes', [App\Http\Controllers\LikeController::class, 'likes'])->name('likes');
+Route::get('/perfil/{id}', [App\Http\Controllers\UserController::class, 'profile'])->name('profile');
+Route::get('/image/delete/{id}', [App\Http\Controllers\ImageController::class, 'delete'])->name('images.delete');
+Route::get('/image/edit/{id}', [App\Http\Controllers\ImageController::class, 'edit'])->name('images.edit');
+Route::post('/image/update', [App\Http\Controllers\ImageController::class, 'update'])->name('images.update');
+Route::get('/gente', [App\Http\Controllers\UserController::class, 'index'])->name('user.index');

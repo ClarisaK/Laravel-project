@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\File;
 //use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\Image;
 use Illuminate\Http\Response;
+use App\Models\Comment;
+use App\Models\Like;
 
 class ImageController extends Controller
 {
@@ -59,4 +61,85 @@ class ImageController extends Controller
         $image = Image::find($id);
         return view('images.detail', ['image'=> $image]);
     }
+
+    public function delete($id){
+            $user = \Auth::user();
+            $image = Image::find($id);
+            $comments = Comment::where('image_id', $id)->get();
+            $likes = Like::where('image_id', $id)->get();
+
+            if($user && $image && $image->user->id == $user->id){
+                //eliminar comentarios
+                if($comments && count($comments) >=1){
+                    foreach($comments as $comment){
+                        $comment->delete();
+                    }
+                }
+                //eliminar likes
+            if($user && $image->user->id == $user->id){
+                //eliminar comentarios
+                if($likes && count($likes) >=1){
+                    foreach($likes as $like){
+                        $like->delete();
+                    }
+                }
+            }
+
+            //eliminar ficheros de imagen
+
+            Storage::disk('images')->delete($image->image_path);
+
+            //eliminar imagen
+            $image->delete();
+            $message = array('message' => 'La imagen se ha borrado con éxito');
+        }else{
+            $message = array('message' => 'La imagen no se ha podido borrar');
+        }
+
+        return redirect()->route('home')->with($message);
+    }
+
+    public function edit($id){
+            $user = \Auth::user();
+            $image = Image::find($id);
+
+            if($user && $image && $image->user->id == $user->id){
+                return view('images.edit', [
+                    'image' => $image
+                ]);
+
+        }else{
+            return redirect()->route('home');
+        }
+    }
+
+    public function update(Request $request){
+        $validate = $this->validate($request, [
+            'description' => 'required',
+            'image_path' => 'image',
+        ]);
+
+        //Recoger datos
+        $image_id = $request->input('image_id');
+        $image_path = $request->file('image_path');
+        $description = $request->input('description');
+
+        //Conseguir objeto image
+        $image = Image::find($image_id);
+        $image->description = $description;
+
+        //Subir fichero
+        if($image_path){
+            $image_path_name = time().$image_path->getClientOriginalName();
+            Storage::disk('images')->put($image_path_name, File::get($image_path));
+            $image->image_path = $image_path_name;
+        }
+
+        //Actualizar registro
+        $image->update();
+
+        return redirect()->route('image.detail', ['id' => $image_id])
+                        ->with(['message' => 'Imagen actualizada con éxito']);
+    }
+
 }
