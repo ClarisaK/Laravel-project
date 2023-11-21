@@ -50,5 +50,10 @@ window.addEventListener("load", function(){
         });
     }
     dislike();
+
+    //buscador
+    $('#buscador').submit(function(){
+        $(this).attr('action',url+'/gente/'+$('#buscador #search').val());
+    })
     
 });
